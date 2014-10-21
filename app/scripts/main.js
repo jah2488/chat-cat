@@ -1,25 +1,30 @@
 var chatData = JSON.parse(localStorage.getItem('cat-chat')) || {};
+var apiUrl   = 'http://tiny-pizza-server.herokuapp.com/collection/chat-cat'
 
-var Message = function (messageData, username, avatar) {
+var Message = function (messageData) {
+    var defaults = {
+       id:      new Date().getTime(),
+       message: 'none',
+       name:    'a ghost',
+       icon:    '',
+       sentAt:  new Date()
+    };
     return {
 
         template: _.template($('#message').html()),
 
-        data: (function () {
-            return {
-                id:      messageData.id       || new Date().getTime(),
-                message: messageData.message  || 'none',
-                name:    messageData.name     || 'a ghost',
-                icon:    messageData.icon     || '',
-                sentAt:  messageData.sentAt   || new Date()
-            };
-        })(),
+        data: _.extend(defaults, messageData),
 
         html: function () { return this.template(this.data); },
 
-        save: function () {
-            chatData[this.data.id] = this.data;
-            localStorage.setItem('cat-chat', JSON.stringify(chatData));
+        save: function (doneCallback) {
+            // chatData[this.data.id] = this.data;
+            // localStorage.setItem('cat-chat', JSON.stringify(chatData));
+            $.ajax({
+                method: "POST",
+                url: apiUrl,
+                data: this.data
+            }).done(doneCallback);
         }
     };
 }
@@ -38,11 +43,15 @@ app = (function($) {
     };
 
     var onSend = function () {
-        var message = new Message({ message: $('#send').val(), name: username, icon: avatar);
+        var message = new Message({
+            message: $('#send').val(),
+            name: username,
+            icon: avatar
+        });
 
-        message.save();
-
-        $('#send').val('');
+        message.save(function (response) {
+            $('#send').val('');
+        });
     };
 
     var addUserMessages = function () {
