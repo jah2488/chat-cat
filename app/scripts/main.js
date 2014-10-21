@@ -1,12 +1,34 @@
-var app = (function($) {
-    var apiUrl   = 'http://tiny-pizza-server.herokuapp.com/collections/chat-cat';
+var chatData = JSON.parse(localStorage.getItem('cat-chat')) || {};
+
+var Message = function (messageData, username, avatar) {
+    return {
+
+        template: _.template($('#message').html()),
+
+        data: (function () {
+            return {
+                id:      messageData.id       || new Date().getTime(),
+                message: messageData.message  || 'none',
+                name:    messageData.name     || 'a ghost',
+                icon:    messageData.icon     || '',
+                sentAt:  messageData.sentAt   || new Date()
+            };
+        })(),
+
+        html: function () { return this.template(this.data); },
+
+        save: function () {
+            chatData[this.data.id] = this.data;
+            localStorage.setItem('cat-chat', JSON.stringify(chatData));
+        }
+    };
+}
+
+app = (function($) {
     var username = '';
     var avatar   = '';
-    var chatData = JSON.parse(localStorage.getItem('cat-chat')) || {};
 
     var userMessageCountTemplate = _.template($('#count').html());
-    var messageTemplate          = _.template($('#message').html());
-
 
     var onSignIn = function () {
         $('.signin, .backdrop').addClass('hide');
@@ -16,25 +38,18 @@ var app = (function($) {
     };
 
     var onSend = function () {
-        saveMessage({
-            id: new Date().getTime(),
-            message: $('#send').val(),
-            name: username,
-            icon: avatar,
-            sentAt: new Date()
-        });
+        var message = new Message({ message: $('#send').val(), name: username, icon: avatar);
+
+        message.save();
 
         $('#send').val('');
     };
 
-    var saveMessage = function (message) {
-        chatData[message.id] = message;
-        localStorage.setItem('cat-chat', JSON.stringify(chatData));
-    };
-
-
     var addUserMessages = function () {
-        var compiledTemplates = _.map(_.values(chatData), messageTemplate);
+        var compiledTemplates = _.map(_.values(chatData), function (messageData) {
+            var message = new Message(messageData);
+            return message.html();
+        });
         $('.historyContainer').html(compiledTemplates);
     };
 
@@ -53,7 +68,7 @@ var app = (function($) {
     setInterval(function () {
         addUserMessages();
         addUserLeaderboard();
-    }, 100);
+    }, 1000);
 
     $('.signin   input[type=submit]').on('click', onSignIn);
     $('.messages input[type=submit]').on('click', onSend);
