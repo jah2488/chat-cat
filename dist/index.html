@@ -1,0 +1,61 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+    <title>chat cat</title>
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <link rel="stylesheet" href="styles/vendor.css">
+
+    <link rel="stylesheet" href="styles/main.css">
+
+    <script src="scripts/vendor/modernizr.js"></script>
+  </head>
+  <body>
+
+    <div class='backdrop'></div>
+    <div class='signin'>
+      <section>
+        <h1>Sign In</h1>
+        <input type='text' id='name' name='name' placeholder='name'/>
+        <input type='url' id='icon' name='icon' placeholder='avatar url'/>
+        <input type='submit' value='Chat Time'/>
+      </section>
+    </div>
+
+    <div class='leaderboard'>
+    </div>
+
+    <div class="historyContainer">
+    </div>
+
+    <div class='messages hide'>
+      <input type='text' id='send' />
+      <input type='submit' value='Send' />
+    </div>
+
+
+    <script type='text/template' id='count'>
+      <div class='user'>
+        <p><%= name %> : <%= length %></p>
+      </div>
+    </script>
+
+    <script type='text/template' id='message'>
+      <div class='message'>
+        <aside>
+          <h5><%= name %></h5>
+        </aside>
+        <section>
+          <%= message %>
+        </section>
+      </div>
+    </script>
+
+    <script src="scripts/vendor.js"></script>
+
+        <script src="scripts/main.js"></script>
+</body>
+</html>
